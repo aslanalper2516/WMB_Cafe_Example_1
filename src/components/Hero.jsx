@@ -1,51 +1,100 @@
 import { Icon } from '@iconify/react';
 import { useLanguage } from '../context/LanguageContext';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 export default function Hero() {
   const { t } = useLanguage();
 
   return (
-    <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+    <section className="relative pt-32 pb-24 md:pt-40 md:pb-32 overflow-hidden bg-premium-gradient">
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-50 border border-gray-200 mb-6">
-              <span className="flex h-2 w-2 rounded-full bg-orange-500"></span>
-              <span className="text-xs font-medium text-gray-600 uppercase tracking-wider">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <motion.div 
+            className="max-w-2xl"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <motion.div 
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-8"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+              <span className="text-xs font-semibold text-primary uppercase tracking-wider">
                 {t('hero.since')}
               </span>
-            </div>
-            <h1 className="text-5xl md:text-7xl font-semibold tracking-tighter text-gray-900 leading-[1.1] mb-8">
+            </motion.div>
+            
+            <motion.h1 
+              className="font-serif text-5xl md:text-6xl lg:text-7xl font-bold text-secondary leading-[1.1] mb-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
               {t('hero.title')}
               <br />
-              <span className="text-gray-400">{t('hero.titleSub')}</span>
-            </h1>
-            <p className="text-lg text-gray-500 leading-relaxed max-w-xl mb-10 font-normal">
+              <span className="text-accent">{t('hero.titleSub')}</span>
+            </motion.h1>
+            
+            <motion.p 
+              className="text-lg md:text-xl text-text-muted leading-relaxed max-w-xl mb-10"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+            >
               {t('hero.description')}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <a href="/menu" className="inline-flex items-center justify-center h-12 px-8 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-all shadow-sm">
+            </motion.p>
+            
+            <motion.div 
+              className="flex flex-col sm:flex-row gap-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+            >
+              <Link 
+                to="/menu" 
+                className="group inline-flex items-center justify-center h-14 px-10 rounded-lg bg-primary text-white text-base font-semibold hover:bg-primary-dark transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+              >
                 {t('hero.viewMenu')}
-                <Icon icon="lucide:arrow-right" className="ml-2" width={16} height={16} strokeWidth={1.5} />
-              </a>
-              <a href="#about" className="inline-flex items-center justify-center h-12 px-8 rounded-lg bg-white border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
-                {t('hero.ourHeritage')}
-              </a>
+                <Icon icon="lucide:arrow-right" className="ml-2 group-hover:translate-x-1 transition-transform" width={18} height={18} strokeWidth={2} />
+              </Link>
+              <Link 
+                to="/locations" 
+                className="inline-flex items-center justify-center h-14 px-10 rounded-lg bg-white border-2 border-secondary text-secondary text-base font-semibold hover:bg-secondary hover:text-white transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105"
+              >
+                {t('nav.locations')}
+              </Link>
+            </motion.div>
+          </motion.div>
+          
+          <motion.div 
+            className="relative mt-12 lg:mt-0"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.6 }}
+          >
+            <div className="absolute -inset-6 bg-primary/10 rounded-3xl rotate-3 -z-10 blur-xl"></div>
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+              <motion.img 
+                src="https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?q=80&w=2670&auto=format&fit=crop" 
+                alt="WMB Cafe Specialties" 
+                className="w-full object-cover aspect-[4/3]"
+                initial={{ scale: 1.1 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 1.2, ease: "easeOut" }}
+                style={{ filter: 'brightness(1.05) contrast(1.1) saturate(1.1)' }}
+              />
             </div>
-          </div>
-          <div className="relative mt-8 lg:mt-0">
-            <div className="absolute -inset-4 bg-orange-100/50 rounded-2xl rotate-2 -z-10"></div>
-            <img 
-              src="https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?q=80&w=2670&auto=format&fit=crop" 
-              alt="WMB Cafe Specialties" 
-              className="rounded-2xl shadow-xl w-full object-cover aspect-[4/3]"
-            />
-          </div>
+          </motion.div>
         </div>
       </div>
 
-      {/* Decorative Background Gradient */}
-      <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 w-[600px] h-[600px] bg-gradient-to-br from-orange-50/50 to-transparent rounded-full blur-3xl -z-10 pointer-events-none"></div>
+      {/* Decorative Background Elements */}
+      <div className="absolute top-0 right-0 -translate-y-20 translate-x-20 w-[800px] h-[800px] bg-gradient-to-br from-primary/5 via-accent/5 to-transparent rounded-full blur-3xl -z-10 pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 translate-y-20 -translate-x-20 w-[600px] h-[600px] bg-gradient-to-tr from-accent/5 to-transparent rounded-full blur-3xl -z-10 pointer-events-none"></div>
     </section>
   );
 }

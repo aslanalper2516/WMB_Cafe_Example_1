@@ -1,25 +1,27 @@
 import { Icon } from '@iconify/react';
 import { useLanguage } from '../context/LanguageContext';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 export default function Menu() {
   const { t } = useLanguage();
 
   return (
-    <section id="menu" className="py-24 border-t border-gray-100">
+    <section id="menu" className="py-24 md:py-32 border-t border-border bg-white">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div>
-            <h2 className="text-3xl font-semibold tracking-tight text-gray-900 mb-4">
+            <h2 className="font-serif text-4xl md:text-5xl font-bold text-secondary mb-4">
               {t('menu.title')}
             </h2>
-            <p className="text-gray-500 max-w-md">
+            <p className="text-lg text-text-muted max-w-md">
               {t('menu.description')}
             </p>
           </div>
-          <a href="/menu" className="text-sm font-medium text-gray-900 hover:text-gray-600 flex items-center gap-1">
+          <Link to="/menu" className="text-sm font-semibold text-primary hover:text-primary-dark flex items-center gap-2 group">
             {t('menu.seeFullMenu')}
-            <Icon icon="lucide:chevron-right" width={16} height={16} strokeWidth={1.5} />
-          </a>
+            <Icon icon="lucide:chevron-right" width={18} height={18} strokeWidth={2} className="group-hover:translate-x-1 transition-transform" />
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[400px]">
@@ -132,13 +134,16 @@ export default function Menu() {
                 <Icon icon="lucide:arrow-right" width={16} height={16} strokeWidth={1.5} />
               </a>
             </div>
-            <div className="w-full md:w-1/2 relative h-64 md:h-auto">
+            <div className="w-full md:w-1/2 relative h-64 md:h-auto overflow-hidden">
               <img 
                 src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2694&auto=format&fit=crop" 
                 alt="Cafe Interior" 
-                className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700"
+                className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 ease-out"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-transparent"></div>
+              {/* Left gradient overlay - slides to left */}
+              <div className="absolute inset-0 w-1/2 bg-gradient-to-r from-gray-900 via-gray-900/80 to-transparent group-hover:translate-x-[-100%] transition-transform duration-1000 ease-out"></div>
+              {/* Right gradient overlay - slides to right */}
+              <div className="absolute inset-0 left-1/2 w-1/2 bg-gradient-to-l from-gray-900 via-gray-900/80 to-transparent group-hover:translate-x-[100%] transition-transform duration-1000 ease-out"></div>
             </div>
           </div>
         </div>

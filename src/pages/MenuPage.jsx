@@ -1,191 +1,361 @@
+import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import LanguageWrapper from '../components/LanguageWrapper';
+import CartDrawer from '../components/CartDrawer';
+import ProductModal from '../components/ProductModal';
 
 export default function MenuPage() {
   const { t, language } = useLanguage();
+  const [cartItems, setCartItems] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('borek');
+  const categoryRefs = useRef({});
+
+  const categories = [
+    { id: 'borek', label: t('menu.categories.borek'), icon: 'lucide:croissant' },
+    { id: 'coffee', label: t('menu.categories.coffee'), icon: 'lucide:coffee' },
+    { id: 'desserts', label: t('menu.categories.desserts'), icon: 'lucide:cake' },
+    { id: 'beverages', label: t('menu.categories.beverages'), icon: 'lucide:glass-water' },
+  ];
 
   const menuItems = {
     borek: [
-      'kıymalıBorek',
-      'peynirliBorek',
-      'ıspanaklıBorek',
-      'suBorek'
+      { key: 'kıymalıBorek', badges: ['signature', 'bestseller'], allergens: 'Gluten, Süt' },
+      { key: 'peynirliBorek', badges: ['vegetarian'], allergens: 'Gluten, Süt' },
+      { key: 'ıspanaklıBorek', badges: ['vegetarian'], allergens: 'Gluten, Süt' },
+      { key: 'suBorek', badges: ['signature'], allergens: 'Gluten, Süt' },
     ],
     coffee: [
-      'espresso',
-      'americano',
-      'cappuccino',
-      'latte',
-      'turkishCoffee'
+      { key: 'espresso', badges: [], allergens: '' },
+      { key: 'americano', badges: [], allergens: '' },
+      { key: 'cappuccino', badges: ['bestseller'], allergens: 'Süt' },
+      { key: 'latte', badges: ['bestseller'], allergens: 'Süt' },
+      { key: 'turkishCoffee', badges: ['signature'], allergens: '' },
     ],
     desserts: [
-      'baklava',
-      'sutlac',
-      'kunefe',
-      'croissant'
+      { key: 'baklava', badges: ['signature', 'bestseller'], allergens: 'Gluten, Fındık, Süt' },
+      { key: 'sutlac', badges: ['vegetarian'], allergens: 'Süt, Gluten' },
+      { key: 'kunefe', badges: ['signature'], allergens: 'Gluten, Süt' },
+      { key: 'croissant', badges: [], allergens: 'Gluten, Süt' },
     ],
     beverages: [
-      'ayran',
-      'freshOrange',
-      'lemonade',
-      'turkishTea'
-    ]
+      { key: 'ayran', badges: ['vegetarian'], allergens: 'Süt' },
+      { key: 'freshOrange', badges: ['vegan'], allergens: '' },
+      { key: 'lemonade', badges: ['vegan'], allergens: '' },
+      { key: 'turkishTea', badges: ['signature'], allergens: '' },
+    ],
   };
 
-  const renderMenuItem = (itemKey) => {
-    const item = t(`menu.items.${itemKey}`);
-    if (!item || typeof item !== 'object') return null;
-    
-    return (
-      <div key={itemKey} className="group bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-gray-300 transition-all">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">{item.name}</h3>
-            <p className="text-sm text-gray-500 leading-relaxed">{item.description}</p>
-          </div>
-        </div>
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-          <span className="text-xl font-bold text-gray-900">{item.price}</span>
-          <button className="w-10 h-10 rounded-full bg-gray-900 text-white flex items-center justify-center hover:bg-gray-800 transition-colors group-hover:scale-110">
-            <Icon icon="lucide:plus" width={18} height={18} strokeWidth={2} />
-          </button>
-        </div>
-      </div>
-    );
+  const getBadgeLabel = (badge) => {
+    const labels = {
+      signature: language === 'tr' ? 'İmza' : 'Signature',
+      bestseller: language === 'tr' ? 'Çok Satan' : 'Bestseller',
+      vegetarian: language === 'tr' ? 'Vejetaryen' : 'Vegetarian',
+      vegan: language === 'tr' ? 'Vegan' : 'Vegan',
+    };
+    return labels[badge] || badge;
+  };
+
+  const getBadgeColor = (badge) => {
+    const colors = {
+      signature: 'bg-primary text-white',
+      bestseller: 'bg-red-500 text-white',
+      vegetarian: 'bg-green-500 text-white',
+      vegan: 'bg-emerald-500 text-white',
+    };
+    return colors[badge] || 'bg-gray-500 text-white';
+  };
+
+  const handleAddToCart = (product) => {
+    const existingItem = cartItems.find(item => item.id === product.key);
+    if (existingItem) {
+      setCartItems(cartItems.map(item =>
+        item.id === product.key
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      ));
+    } else {
+      const item = t(`menu.items.${product.key}`);
+      setCartItems([...cartItems, {
+        id: product.key,
+        name: item.name,
+        description: item.description,
+        price: parseFloat(item.price.replace(/[^0-9.]/g, '')),
+        quantity: 1,
+      }]);
+    }
+    setIsCartOpen(true);
+  };
+
+  const handleUpdateQuantity = (id, quantity) => {
+    if (quantity <= 0) {
+      setCartItems(cartItems.filter(item => item.id !== id));
+    } else {
+      setCartItems(cartItems.map(item =>
+        item.id === id ? { ...item, quantity } : item
+      ));
+    }
+  };
+
+  const handleRemoveItem = (id) => {
+    setCartItems(cartItems.filter(item => item.id !== id));
+  };
+
+  const handleProductClick = (product) => {
+    const item = t(`menu.items.${product.key}`);
+    setSelectedProduct({
+      ...product,
+      ...item,
+      image: `https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800`,
+    });
+    setIsModalOpen(true);
+  };
+
+  const scrollToCategory = (categoryId) => {
+    setActiveCategory(categoryId);
+    categoryRefs.current[categoryId]?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
   };
 
   return (
     <LanguageWrapper>
-      <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2 group">
-              <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center text-white">
-                <span className="font-semibold text-xs tracking-tighter">WMB</span>
+      <div className="min-h-screen bg-background">
+        {/* Header */}
+        <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-lg border-b border-border shadow-sm">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="flex items-center justify-between">
+              <Link to="/" className="flex items-center gap-3 group">
+                <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center text-white shadow-md">
+                  <span className="font-bold text-sm">WMB</span>
+                </div>
+                <span className="font-semibold text-base text-secondary">WMB Cafe</span>
+              </Link>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setIsCartOpen(true)}
+                  className="relative p-2 text-text-muted hover:text-secondary transition-colors"
+                >
+                  <Icon icon="lucide:shopping-cart" width={24} height={24} />
+                  {cartItems.length > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-white text-xs font-bold flex items-center justify-center">
+                      {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+                    </span>
+                  )}
+                </button>
+                <Link
+                  to="/"
+                  className="flex items-center gap-2 text-sm font-medium text-text-muted hover:text-secondary transition-colors"
+                >
+                  <Icon icon="lucide:arrow-left" width={18} height={18} />
+                  <span className="hidden sm:inline">{t('nav.menu')}</span>
+                </Link>
               </div>
-              <span className="font-medium text-sm tracking-tight text-gray-900">
-                WMB Cafe
-              </span>
-            </Link>
-            <Link 
-              to="/" 
-              className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+            </div>
+          </div>
+        </header>
+
+        {/* Hero Section */}
+        <section className="bg-premium-gradient border-b border-border">
+          <div className="max-w-7xl mx-auto px-6 py-16 md:py-20">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center max-w-3xl mx-auto"
             >
-              <Icon icon="lucide:arrow-left" width={18} height={18} />
-              <span className="hidden sm:inline">{t('nav.menu')}</span>
-            </Link>
+              <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-secondary mb-4">
+                {t('menu.pageTitle')}
+              </h1>
+              <p className="text-lg md:text-xl text-text-muted">
+                {t('menu.pageSubtitle')}
+              </p>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Sticky Category Bar */}
+        <div className="sticky top-20 z-30 bg-white/95 backdrop-blur-lg border-b border-border shadow-sm">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide py-4">
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => scrollToCategory(category.id)}
+                  className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold text-sm whitespace-nowrap transition-all ${
+                    activeCategory === category.id
+                      ? 'bg-primary text-white shadow-md'
+                      : 'bg-background text-text-muted hover:text-secondary hover:bg-background'
+                  }`}
+                >
+                  <Icon icon={category.icon} width={18} height={18} />
+                  {category.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </header>
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-orange-50 via-white to-orange-50 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-12 md:py-16">
-          <div className="text-center max-w-2xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-4">
-              {t('menu.pageTitle')}
-            </h1>
-            <p className="text-lg text-gray-600">
-              {t('menu.pageSubtitle')}
+        {/* Menu Content */}
+        <main className="max-w-7xl mx-auto px-6 py-12">
+          {categories.map((category) => (
+            <section
+              key={category.id}
+              ref={(el) => (categoryRefs.current[category.id] = el)}
+              className="mb-20 scroll-mt-24"
+            >
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="flex items-center gap-3 mb-10"
+              >
+                <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                  <Icon icon={category.icon} width={24} height={24} />
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold text-secondary">
+                  {category.label}
+                </h2>
+              </motion.div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {menuItems[category.id].map((product) => {
+                  const item = t(`menu.items.${product.key}`);
+                  if (!item || typeof item !== 'object') return null;
+
+                  return (
+                    <motion.div
+                      key={product.key}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      className="group bg-white rounded-2xl border border-border overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                    >
+                      <div className="relative h-48 bg-background overflow-hidden">
+                        <img
+                          src={`https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop`}
+                          alt={item.name}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                        {product.badges && product.badges.length > 0 && (
+                          <div className="absolute top-3 left-3 flex flex-wrap gap-2">
+                            {product.badges.map((badge, index) => (
+                              <span
+                                key={index}
+                                className={`px-2.5 py-1 rounded-full text-xs font-bold ${getBadgeColor(badge)} shadow-md`}
+                              >
+                                {getBadgeLabel(badge)}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="p-6">
+                        <h3 className="text-xl font-bold text-secondary mb-2">{item.name}</h3>
+                        <p className="text-sm text-text-muted mb-4 leading-relaxed line-clamp-2">
+                          {item.description}
+                        </p>
+
+                        {product.allergens && (
+                          <p className="text-xs text-text-muted mb-4">
+                            <span className="font-semibold">
+                              {language === 'tr' ? 'Alerjen: ' : 'Allergens: '}
+                            </span>
+                            {product.allergens}
+                          </p>
+                        )}
+
+                        <div className="flex items-center justify-between pt-4 border-t border-border">
+                          <span className="text-2xl font-bold text-primary">{item.price}</span>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleProductClick(product)}
+                              className="px-4 py-2 rounded-lg border border-border text-sm font-semibold text-secondary hover:bg-background transition-colors"
+                            >
+                              {language === 'tr' ? 'Detay' : 'Details'}
+                            </button>
+                            <button
+                              onClick={() => {
+                                const productData = {
+                                  key: product.key,
+                                  name: item.name,
+                                  description: item.description,
+                                  price: parseFloat(item.price.replace(/[^0-9.]/g, '')),
+                                };
+                                handleAddToCart(productData);
+                              }}
+                              className="w-10 h-10 rounded-lg bg-primary text-white flex items-center justify-center hover:bg-primary-dark transition-all shadow-md hover:shadow-lg hover:scale-110 active:scale-95"
+                            >
+                              <Icon icon="lucide:plus" width={20} height={20} strokeWidth={2.5} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
+        </main>
+
+        {/* Footer CTA */}
+        <section className="bg-secondary text-white py-16">
+          <div className="max-w-7xl mx-auto px-6 text-center">
+            <h3 className="text-3xl md:text-4xl font-bold mb-4">
+              {language === 'tr' ? 'Sipariş vermek ister misiniz?' : 'Would you like to order?'}
+            </h3>
+            <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
+              {language === 'tr' ? 'Online sipariş verin veya bizi ziyaret edin' : 'Order online or visit us'}
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Menu Content */}
-      <main className="max-w-7xl mx-auto px-6 py-12">
-        {/* Börekler */}
-        <section className="mb-16">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center">
-              <Icon icon="lucide:croissant" width={20} height={20} />
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={() => setIsCartOpen(true)}
+                className="inline-flex items-center justify-center h-14 px-10 rounded-lg bg-primary text-white text-base font-semibold hover:bg-primary-dark transition-all shadow-lg hover:shadow-xl hover:scale-105"
+              >
+                {t('nav.orderOnline')}
+              </button>
+              <Link
+                to="/"
+                className="inline-flex items-center justify-center h-14 px-10 rounded-lg border-2 border-white/20 text-white text-base font-semibold hover:bg-white/10 transition-all"
+              >
+                {language === 'tr' ? 'Ana Sayfaya Dön' : 'Back to Home'}
+              </Link>
             </div>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-              {t('menu.categories.borek')}
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {menuItems.borek.map(renderMenuItem)}
           </div>
         </section>
+      </div>
 
-        {/* Kahveler */}
-        <section className="mb-16">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center">
-              <Icon icon="lucide:coffee" width={20} height={20} />
-            </div>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-              {t('menu.categories.coffee')}
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {menuItems.coffee.map(renderMenuItem)}
-          </div>
-        </section>
+      {/* Cart Drawer */}
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cartItems={cartItems}
+        onUpdateQuantity={handleUpdateQuantity}
+        onRemoveItem={handleRemoveItem}
+      />
 
-        {/* Tatlılar */}
-        <section className="mb-16">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center">
-              <Icon icon="lucide:cake" width={20} height={20} />
-            </div>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-              {t('menu.categories.desserts')}
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {menuItems.desserts.map(renderMenuItem)}
-          </div>
-        </section>
-
-        {/* İçecekler */}
-        <section className="mb-16">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center">
-              <Icon icon="lucide:glass-water" width={20} height={20} />
-            </div>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-              {t('menu.categories.beverages')}
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {menuItems.beverages.map(renderMenuItem)}
-          </div>
-        </section>
-      </main>
-
-      {/* Footer CTA */}
-      <section className="bg-gray-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <h3 className="text-2xl font-bold mb-4">
-            {language === 'tr' ? 'Sipariş vermek ister misiniz?' : 'Would you like to order?'}
-          </h3>
-          <p className="text-gray-400 mb-6">
-            {language === 'tr' ? 'Online sipariş verin veya bizi ziyaret edin' : 'Order online or visit us'}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a 
-              href="#" 
-              className="inline-flex items-center justify-center h-12 px-8 rounded-lg bg-white text-gray-900 text-sm font-medium hover:bg-gray-100 transition-all"
-            >
-              {t('nav.orderOnline')}
-            </a>
-            <Link 
-              to="/" 
-              className="inline-flex items-center justify-center h-12 px-8 rounded-lg border border-white/20 text-white text-sm font-medium hover:bg-white/10 transition-all"
-            >
-              {language === 'tr' ? 'Ana Sayfaya Dön' : 'Back to Home'}
-            </Link>
-          </div>
-        </div>
-      </section>
-    </div>
+      {/* Product Modal */}
+      {selectedProduct && (
+        <ProductModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedProduct(null);
+          }}
+          product={selectedProduct}
+          onAddToCart={(product) => {
+            handleAddToCart({ key: product.key || selectedProduct.key, ...product });
+          }}
+        />
+      )}
     </LanguageWrapper>
   );
 }
-

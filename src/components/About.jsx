@@ -1,63 +1,148 @@
 import { useLanguage } from '../context/LanguageContext';
+import { motion } from 'framer-motion';
 
 export default function About() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  const timeline = [
+    {
+      year: '1985',
+      title: language === 'tr' ? 'Başlangıç' : 'The Beginning',
+      description: language === 'tr' 
+        ? 'Mütevazı bir aile fırını olarak Sariyer\'de yolculuğumuza başladık.'
+        : 'We started our journey as a humble family bakery in Sariyer.',
+      image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800'
+    },
+    {
+      year: '2000',
+      title: language === 'tr' ? 'Büyüme' : 'Growth',
+      description: language === 'tr'
+        ? 'İlk franchise lokasyonumuzu açtık ve markamızı genişletmeye başladık.'
+        : 'We opened our first franchise location and began expanding our brand.',
+      image: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800'
+    },
+    {
+      year: '2015',
+      title: language === 'tr' ? 'Modernizasyon' : 'Modernization',
+      description: language === 'tr'
+        ? 'WMB Cafe markası altında modern kafe konseptine geçiş yaptık.'
+        : 'We transitioned to a modern cafe concept under the WMB Cafe brand.',
+      image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800'
+    },
+    {
+      year: '2023',
+      title: language === 'tr' ? 'Bugün' : 'Today',
+      description: language === 'tr'
+        ? '12 lokasyonda kaliteli lezzetler sunmaya devam ediyoruz.'
+        : 'We continue to serve quality flavors at 12 locations.',
+      image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800'
+    },
+  ];
 
   return (
-    <section id="about" className="py-24 bg-gray-50 border-y border-gray-200">
+    <section id="about" className="py-24 md:py-32 bg-white">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-          <div className="relative">
-            <div className="absolute -top-4 -left-4 w-24 h-24 bg-orange-100 rounded-full blur-2xl"></div>
-            <div className="relative rounded-2xl overflow-hidden shadow-lg border border-gray-200">
-              <img 
-                src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2670&auto=format&fit=crop" 
-                alt="Bakery History" 
-                className="w-full aspect-[4/3] object-cover"
-              />
-            </div>
-          </div>
-          <div>
-            <h2 className="text-3xl font-semibold tracking-tight text-gray-900 mb-6">
-              {t('about.title')}
-            </h2>
-            <div className="space-y-6 text-gray-500 font-light">
-              <p>
-                {t('about.description1')}
-              </p>
-              <p>
-                {t('about.description2')}
-              </p>
-            </div>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-secondary mb-6">
+            {t('about.title')}
+          </h2>
+          <p className="text-lg md:text-xl text-text-muted max-w-3xl mx-auto">
+            {t('about.description1')}
+          </p>
+        </motion.div>
 
-            <div className="grid grid-cols-3 gap-8 mt-10 pt-10 border-t border-gray-200">
-              <div>
-                <span className="block text-3xl font-semibold text-gray-900 tracking-tight">
-                  35+
-                </span>
-                <span className="text-xs text-gray-500 uppercase tracking-wide mt-1">
-                  {t('about.years')}
-                </span>
-              </div>
-              <div>
-                <span className="block text-3xl font-semibold text-gray-900 tracking-tight">
-                  12
-                </span>
-                <span className="text-xs text-gray-500 uppercase tracking-wide mt-1">
-                  {t('about.locations')}
-                </span>
-              </div>
-              <div>
-                <span className="block text-3xl font-semibold text-gray-900 tracking-tight">
-                  10k+
-                </span>
-                <span className="text-xs text-gray-500 uppercase tracking-wide mt-1">
-                  {t('about.happyGuests')}
-                </span>
-              </div>
-            </div>
+        {/* Timeline */}
+        <div className="relative">
+          {/* Timeline Line */}
+          <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-primary/20 hidden md:block"></div>
+
+          <div className="space-y-16 md:space-y-24">
+            {timeline.map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.2 }}
+                className={`relative flex flex-col md:flex-row items-center gap-8 ${
+                  index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
+                }`}
+              >
+                {/* Timeline Dot */}
+                <div className="absolute left-8 md:left-1/2 w-4 h-4 rounded-full bg-primary border-4 border-white shadow-lg transform -translate-x-1/2 z-10"></div>
+
+                {/* Content */}
+                <div className={`flex-1 ${index % 2 === 0 ? 'md:pr-12 md:text-right' : 'md:pl-12'}`}>
+                  <div className={`inline-block ${index % 2 === 0 ? 'md:ml-auto' : ''}`}>
+                    <span className="text-5xl md:text-6xl font-serif font-bold text-primary/20 mb-2 block">
+                      {item.year}
+                    </span>
+                    <h3 className="text-2xl md:text-3xl font-bold text-secondary mb-4">
+                      {item.title}
+                    </h3>
+                    <p className="text-text-muted leading-relaxed max-w-md">
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Image */}
+                <div className={`flex-1 ${index % 2 === 0 ? 'md:pl-12' : 'md:pr-12'}`}>
+                  <div className="relative rounded-2xl overflow-hidden shadow-xl group">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-64 md:h-80 object-cover group-hover:scale-110 transition-transform duration-700"
+                      style={{ filter: 'brightness(1.05) contrast(1.1) saturate(1.1)' }}
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-secondary/20 to-transparent"></div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
+
+        {/* Stats */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-24 pt-16 border-t border-border"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+            <div>
+              <span className="block text-5xl md:text-6xl font-serif font-bold text-primary mb-3">
+                35+
+              </span>
+              <span className="text-sm md:text-base text-text-muted uppercase tracking-wider font-semibold">
+                {t('about.years')}
+              </span>
+            </div>
+            <div>
+              <span className="block text-5xl md:text-6xl font-serif font-bold text-primary mb-3">
+                12
+              </span>
+              <span className="text-sm md:text-base text-text-muted uppercase tracking-wider font-semibold">
+                {t('about.locations')}
+              </span>
+            </div>
+            <div>
+              <span className="block text-5xl md:text-6xl font-serif font-bold text-primary mb-3">
+                10k+
+              </span>
+              <span className="text-sm md:text-base text-text-muted uppercase tracking-wider font-semibold">
+                {t('about.happyGuests')}
+              </span>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

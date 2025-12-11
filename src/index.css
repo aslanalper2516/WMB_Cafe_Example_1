@@ -1,16 +1,67 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: 'Inter', system-ui, sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  
+  /* Premium Color Palette */
+  --color-primary: #D4AF37;
+  --color-primary-dark: #B8941F;
+  --color-secondary: #1C1C1C;
+  --color-background: #FAF9F6;
+  --color-accent: #8B6F47;
+  --color-cta: #C9A961;
+  --color-text: #1C1C1C;
+  --color-text-muted: #555555;
+  --color-border: #E5E5E5;
 }
 
 @layer base {
   body {
-    @apply bg-white text-gray-900 font-sans antialiased;
+    @apply bg-[#FAF9F6] text-[#1C1C1C] font-sans antialiased;
   }
   
   *::selection {
-    @apply bg-orange-100 text-orange-900;
+    @apply bg-[#D4AF37]/20 text-[#1C1C1C];
+  }
+
+  h1 {
+    @apply font-serif text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight;
+  }
+
+  h2 {
+    @apply font-sans text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight tracking-tight;
+  }
+
+  h3 {
+    @apply font-sans text-2xl md:text-3xl font-semibold leading-tight;
+  }
+
+  p {
+    @apply text-base md:text-lg leading-relaxed;
+  }
+}
+
+@layer utilities {
+  .text-muted {
+    @apply text-[#555555];
+  }
+  
+  .bg-premium-gradient {
+    background: linear-gradient(135deg, #FAF9F6 0%, #F5F3ED 100%);
+  }
+  
+  .text-premium-gold {
+    @apply text-[#D4AF37];
+  }
+  
+  .bg-premium-gold {
+    @apply bg-[#D4AF37];
+  }
+  
+  .border-premium-gold {
+    @apply border-[#D4AF37];
   }
 }

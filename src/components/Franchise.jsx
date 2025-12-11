@@ -1,53 +1,340 @@
+import { useState } from 'react';
 import { Icon } from '@iconify/react';
 import { useLanguage } from '../context/LanguageContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Franchise() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    city: '',
+    investmentRange: '',
+    experience: '',
+    additionalRequirements: '',
+  });
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleNext = () => {
+    if (step === 1) {
+      if (formData.firstName && formData.lastName && formData.email && formData.phone) {
+        setStep(2);
+      }
+    } else if (step === 2) {
+      if (formData.city && formData.investmentRange && formData.experience) {
+        handleSubmit();
+      }
+    }
+  };
+
+  const handleSubmit = () => {
+    if (acceptedTerms) {
+      setIsSubmitted(true);
+      // Here you would typically send the data to your backend
+      console.log('Form submitted:', formData);
+    }
+  };
+
+  const investmentRanges = language === 'tr' 
+    ? ['50.000₺ - 100.000₺', '100.000₺ - 250.000₺', '250.000₺ - 500.000₺', '500.000₺+']
+    : ['$50,000 - $100,000', '$100,000 - $250,000', '$250,000 - $500,000', '$500,000+'];
+
+  const experienceOptions = language === 'tr'
+    ? ['Yok', '1-3 Yıl', '3-5 Yıl', '5+ Yıl']
+    : ['None', '1-3 Years', '3-5 Years', '5+ Years'];
+
+  if (isSubmitted) {
+    return (
+      <section id="franchise" className="py-24 md:py-32 relative overflow-hidden bg-premium-gradient">
+        <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6"
+          >
+            <Icon icon="lucide:check" width={40} height={40} className="text-primary" strokeWidth={3} />
+          </motion.div>
+          <h2 className="text-3xl md:text-4xl font-bold text-secondary mb-4">
+            {language === 'tr' ? 'Başvurunuz Alındı!' : 'Application Received!'}
+          </h2>
+          <p className="text-lg text-text-muted mb-8 max-w-2xl mx-auto">
+            {language === 'tr'
+              ? 'En kısa sürede sizinle iletişime geçeceğiz. Franchise bilgi kitapçığımızı indirmek ister misiniz?'
+              : 'We will contact you soon. Would you like to download our franchise information booklet?'}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="#"
+              className="inline-flex items-center justify-center gap-2 h-14 px-8 rounded-lg bg-primary text-white font-semibold hover:bg-primary-dark transition-all shadow-lg hover:shadow-xl"
+            >
+              <Icon icon="lucide:download" width={20} height={20} />
+              {language === 'tr' ? 'Kitapçığı İndir' : 'Download Booklet'}
+            </a>
+            <button
+              onClick={() => {
+                setIsSubmitted(false);
+                setStep(1);
+                setFormData({
+                  firstName: '',
+                  lastName: '',
+                  email: '',
+                  phone: '',
+                  city: '',
+                  investmentRange: '',
+                  experience: '',
+                  additionalRequirements: '',
+                });
+              }}
+              className="inline-flex items-center justify-center h-14 px-8 rounded-lg border-2 border-secondary text-secondary font-semibold hover:bg-secondary hover:text-white transition-all"
+            >
+              {language === 'tr' ? 'Yeni Başvuru' : 'New Application'}
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section id="franchise" className="py-24 relative overflow-hidden">
-      <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 text-gray-900 mb-6">
-          <Icon icon="lucide:store" width={24} height={24} strokeWidth={1.5} />
-        </div>
-        <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter text-gray-900 mb-6">
-          {t('franchise.title')}
-        </h2>
-        <p className="text-lg text-gray-500 mb-10 max-w-2xl mx-auto">
-          {t('franchise.description')}
-        </p>
-        <form className="max-w-md mx-auto space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <input 
-              type="text" 
-              placeholder={t('franchise.firstName')}
-              className="w-full h-11 px-4 rounded-lg bg-white border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all"
-            />
-            <input 
-              type="text" 
-              placeholder={t('franchise.lastName')}
-              className="w-full h-11 px-4 rounded-lg bg-white border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all"
-            />
+    <section id="franchise" className="py-24 md:py-32 relative overflow-hidden bg-premium-gradient">
+      <div className="max-w-4xl mx-auto px-6 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-primary/10 text-primary mb-6">
+            <Icon icon="lucide:store" width={32} height={32} strokeWidth={1.5} />
           </div>
-          <input 
-            type="email" 
-            placeholder={t('franchise.email')}
-            className="w-full h-11 px-4 rounded-lg bg-white border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all"
-          />
-          <button 
-            type="button" 
-            className="w-full h-11 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-all shadow-md"
-          >
-            {t('franchise.submit')}
-          </button>
-          <p className="text-xs text-gray-400 mt-4">
-            {t('franchise.terms')}
+          <h2 className="font-serif text-4xl md:text-5xl font-bold text-secondary mb-6">
+            {t('franchise.title')}
+          </h2>
+          <p className="text-lg md:text-xl text-text-muted max-w-2xl mx-auto mb-8">
+            {t('franchise.description')}
           </p>
-        </form>
+
+          {/* Progress Steps */}
+          <div className="flex items-center justify-center gap-4 mb-12">
+            <div className={`flex items-center gap-2 ${step >= 1 ? 'text-primary' : 'text-text-muted'}`}>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                step >= 1 ? 'bg-primary text-white' : 'bg-background border-2 border-border'
+              }`}>
+                1
+              </div>
+              <span className="hidden sm:inline font-semibold">
+                {language === 'tr' ? 'Kişisel Bilgiler' : 'Personal Info'}
+              </span>
+            </div>
+            <div className={`w-16 h-0.5 ${step >= 2 ? 'bg-primary' : 'bg-border'}`}></div>
+            <div className={`flex items-center gap-2 ${step >= 2 ? 'text-primary' : 'text-text-muted'}`}>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                step >= 2 ? 'bg-primary text-white' : 'bg-background border-2 border-border'
+              }`}>
+                2
+              </div>
+              <span className="hidden sm:inline font-semibold">
+                {language === 'tr' ? 'İş Bilgileri' : 'Business Info'}
+              </span>
+            </div>
+          </div>
+        </motion.div>
+
+        <AnimatePresence mode="wait">
+          {step === 1 && (
+            <motion.div
+              key="step1"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="bg-white rounded-2xl shadow-xl border border-border p-8 md:p-10"
+            >
+              <h3 className="text-2xl font-bold text-secondary mb-6">
+                {language === 'tr' ? 'Kişisel Bilgiler' : 'Personal Information'}
+              </h3>
+              <div className="space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-sm font-semibold text-secondary mb-2">
+                      {t('franchise.firstName')} *
+                    </label>
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                      className="w-full h-12 px-4 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-secondary mb-2">
+                      {t('franchise.lastName')} *
+                    </label>
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                      className="w-full h-12 px-4 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-secondary mb-2">
+                    {t('franchise.email')} *
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full h-12 px-4 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-secondary mb-2">
+                    {language === 'tr' ? 'Telefon' : 'Phone'} *
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    className="w-full h-12 px-4 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    required
+                  />
+                </div>
+                <button
+                  onClick={handleNext}
+                  className="w-full h-14 rounded-lg bg-primary text-white font-semibold hover:bg-primary-dark transition-all shadow-lg hover:shadow-xl mt-6"
+                >
+                  {language === 'tr' ? 'Devam Et' : 'Continue'}
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {step === 2 && (
+            <motion.div
+              key="step2"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="bg-white rounded-2xl shadow-xl border border-border p-8 md:p-10"
+            >
+              <h3 className="text-2xl font-bold text-secondary mb-6">
+                {language === 'tr' ? 'İş Bilgileri' : 'Business Information'}
+              </h3>
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-sm font-semibold text-secondary mb-2">
+                    {language === 'tr' ? 'Şehir' : 'City'} *
+                  </label>
+                  <input
+                    type="text"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleInputChange}
+                    className="w-full h-12 px-4 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-secondary mb-2">
+                    {language === 'tr' ? 'Yatırım Aralığı' : 'Investment Range'} *
+                  </label>
+                  <select
+                    name="investmentRange"
+                    value={formData.investmentRange}
+                    onChange={handleInputChange}
+                    className="w-full h-12 px-4 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    required
+                  >
+                    <option value="">{language === 'tr' ? 'Seçiniz' : 'Select'}</option>
+                    {investmentRanges.map((range, index) => (
+                      <option key={index} value={range}>{range}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-secondary mb-2">
+                    {language === 'tr' ? 'Deneyim' : 'Experience'} *
+                  </label>
+                  <select
+                    name="experience"
+                    value={formData.experience}
+                    onChange={handleInputChange}
+                    className="w-full h-12 px-4 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    required
+                  >
+                    <option value="">{language === 'tr' ? 'Seçiniz' : 'Select'}</option>
+                    {experienceOptions.map((exp, index) => (
+                      <option key={index} value={exp}>{exp}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-secondary mb-2">
+                    {language === 'tr' ? 'Ek Gereksinimler' : 'Additional Requirements'}
+                  </label>
+                  <textarea
+                    name="additionalRequirements"
+                    value={formData.additionalRequirements}
+                    onChange={handleInputChange}
+                    rows={4}
+                    className="w-full px-4 py-3 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
+                    placeholder={language === 'tr' ? 'Varsa eklemek istedikleriniz...' : 'Any additional information...'}
+                  />
+                </div>
+                <div className="flex items-start gap-3 pt-4">
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    checked={acceptedTerms}
+                    onChange={(e) => setAcceptedTerms(e.target.checked)}
+                    className="mt-1 w-5 h-5 rounded border-border text-primary focus:ring-primary/20"
+                    required
+                  />
+                  <label htmlFor="terms" className="text-sm text-text-muted">
+                    {language === 'tr'
+                      ? 'KVKK aydınlatma metnini okudum ve kabul ediyorum. *'
+                      : 'I have read and accept the privacy policy. *'}
+                  </label>
+                </div>
+                <div className="flex gap-4 mt-6">
+                  <button
+                    onClick={() => setStep(1)}
+                    className="flex-1 h-14 rounded-lg border-2 border-border text-secondary font-semibold hover:bg-background transition-all"
+                  >
+                    {language === 'tr' ? 'Geri' : 'Back'}
+                  </button>
+                  <button
+                    onClick={handleNext}
+                    disabled={!acceptedTerms}
+                    className="flex-1 h-14 rounded-lg bg-primary text-white font-semibold hover:bg-primary-dark transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {t('franchise.submit')}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Grid Pattern BG */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] -z-10"></div>
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] -z-10"></div>
     </section>
   );
 }
