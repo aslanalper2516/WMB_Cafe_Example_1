@@ -1,0 +1,148 @@
+import { Icon } from '@iconify/react';
+import { useLanguage } from '../context/LanguageContext';
+
+export default function Menu() {
+  const { t } = useLanguage();
+
+  return (
+    <section id="menu" className="py-24 border-t border-gray-100">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div>
+            <h2 className="text-3xl font-semibold tracking-tight text-gray-900 mb-4">
+              {t('menu.title')}
+            </h2>
+            <p className="text-gray-500 max-w-md">
+              {t('menu.description')}
+            </p>
+          </div>
+          <a href="/menu" className="text-sm font-medium text-gray-900 hover:text-gray-600 flex items-center gap-1">
+            {t('menu.seeFullMenu')}
+            <Icon icon="lucide:chevron-right" width={16} height={16} strokeWidth={1.5} />
+          </a>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[400px]">
+          {/* Item 1: The Classic */}
+          <div className="group relative rounded-2xl overflow-hidden bg-gray-50 border border-gray-200 md:col-span-2 hover:shadow-lg transition-all duration-300">
+            <div className="absolute inset-0 z-0">
+              <img 
+                src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/917d6f93-fb36-439a-8c48-884b67b35381_1600w.jpg" 
+                alt="Borek" 
+                className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent"></div>
+            </div>
+            <div className="absolute bottom-0 left-0 p-8 z-10">
+              <div className="flex items-center gap-2 mb-2 text-orange-300">
+                <Icon icon="lucide:star" width={16} height={16} className="text-orange-400" />
+                <span className="text-xs font-semibold uppercase tracking-wider">
+                  {t('menu.signature')}
+                </span>
+              </div>
+              <h3 className="text-2xl font-medium text-white mb-2">
+                {t('menu.legendaryBorek')}
+              </h3>
+              <p className="text-gray-300 text-sm max-w-md line-clamp-2">
+                {t('menu.borekDescription')}
+              </p>
+            </div>
+          </div>
+
+          {/* Item 2: Coffee */}
+          <div className="group relative rounded-2xl overflow-hidden bg-white border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all">
+            <div className="h-1/2 overflow-hidden bg-gray-100 relative">
+              <img 
+                src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=2671&auto=format&fit=crop" 
+                alt="Coffee" 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+            <div className="p-6 h-1/2 flex flex-col justify-between">
+              <div>
+                <div className="w-10 h-10 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center mb-4">
+                  <Icon icon="lucide:coffee" width={20} height={20} strokeWidth={1.5} />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-1">
+                  {t('menu.specialtyBrews')}
+                </h3>
+                <p className="text-sm text-gray-500">
+                  {t('menu.coffeeDescription')}
+                </p>
+              </div>
+              <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                <span className="text-sm font-medium text-gray-900">{t('menu.price')}</span>
+                <button className="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center hover:bg-gray-700 transition-colors">
+                  <Icon icon="lucide:plus" width={16} height={16} strokeWidth={1.5} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Item 3: Sweet Pastry */}
+          <div className="group relative rounded-2xl overflow-hidden bg-white border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all">
+            <div className="p-6 h-full flex flex-col">
+              <div className="flex-1">
+                <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
+                  <Icon icon="lucide:croissant" width={20} height={20} strokeWidth={1.5} />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  {t('menu.sweetDelights')}
+                </h3>
+                <p className="text-sm text-gray-500 mb-6">
+                  {t('menu.sweetDescription')}
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-3 text-sm text-gray-600">
+                    <Icon icon="lucide:check" className="text-green-500" width={14} />
+                    {t('menu.freshlyBaked')}
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-gray-600">
+                    <Icon icon="lucide:check" className="text-green-500" width={14} />
+                    {t('menu.premiumButter')}
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-gray-600">
+                    <Icon icon="lucide:check" className="text-green-500" width={14} />
+                    {t('menu.noPreservatives')}
+                  </li>
+                </ul>
+              </div>
+              <div className="mt-6">
+                <a href="#" className="block w-full py-2 text-center text-sm font-medium text-gray-900 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                  {t('menu.viewSelection')}
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Item 4: Atmosphere */}
+          <div className="group relative rounded-2xl overflow-hidden bg-gray-900 md:col-span-2 flex flex-col md:flex-row">
+            <div className="w-full md:w-1/2 p-8 md:p-10 flex flex-col justify-center relative z-10">
+              <span className="text-orange-500 font-medium text-xs tracking-wider uppercase mb-3">
+                {t('menu.ourPromise')}
+              </span>
+              <h3 className="text-2xl font-medium text-white mb-4">
+                {t('menu.placeToBelong')}
+              </h3>
+              <p className="text-gray-400 text-sm mb-8 leading-relaxed">
+                {t('menu.promiseDescription')}
+              </p>
+              <a href="#locations" className="inline-flex items-center text-white text-sm font-medium hover:text-orange-400 transition-colors gap-2">
+                {t('menu.findCafe')}
+                <Icon icon="lucide:arrow-right" width={16} height={16} strokeWidth={1.5} />
+              </a>
+            </div>
+            <div className="w-full md:w-1/2 relative h-64 md:h-auto">
+              <img 
+                src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2694&auto=format&fit=crop" 
+                alt="Cafe Interior" 
+                className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-transparent"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
