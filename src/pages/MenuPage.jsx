@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import LanguageWrapper from '../components/LanguageWrapper';
 import CartDrawer from '../components/CartDrawer';
 import ProductModal from '../components/ProductModal';
+import Toast from '../components/Toast';
 
 export default function MenuPage() {
   const { t, language } = useLanguage();
@@ -14,6 +15,8 @@ export default function MenuPage() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState('borek');
+  const [toast, setToast] = useState({ message: '', isVisible: false });
+  const [rippleButton, setRippleButton] = useState(null);
   const categoryRefs = useRef({});
 
   const categories = [
@@ -73,6 +76,9 @@ export default function MenuPage() {
 
   const handleAddToCart = (product) => {
     const existingItem = cartItems.find(item => item.id === product.key);
+    const item = t(`menu.items.${product.key}`);
+    const productName = item.name || product.name;
+    
     if (existingItem) {
       setCartItems(cartItems.map(item =>
         item.id === product.key
@@ -80,16 +86,35 @@ export default function MenuPage() {
           : item
       ));
     } else {
-      const item = t(`menu.items.${product.key}`);
       setCartItems([...cartItems, {
         id: product.key,
-        name: item.name,
-        description: item.description,
-        price: parseFloat(item.price.replace(/[^0-9.]/g, '')),
+        name: productName,
+        description: item.description || product.description,
+        price: parseFloat((item.price || product.price).replace(/[^0-9.]/g, '')),
         quantity: 1,
       }]);
     }
+    
+    // Show toast notification
+    setToast({
+      message: language === 'tr' ? `${productName} sepete eklendi` : `${productName} added to cart`,
+      isVisible: true,
+    });
+    
+    // Auto-hide toast after 3 seconds
+    setTimeout(() => {
+      setToast({ ...toast, isVisible: false });
+    }, 3000);
+    
     setIsCartOpen(true);
+  };
+  
+  const handleButtonClick = (productKey, productData) => {
+    // Ripple effect
+    setRippleButton(productKey);
+    setTimeout(() => setRippleButton(null), 300);
+    
+    handleAddToCart(productData);
   };
 
   const handleUpdateQuantity = (id, quantity) => {
@@ -289,11 +314,20 @@ export default function MenuPage() {
                                   description: item.description,
                                   price: parseFloat(item.price.replace(/[^0-9.]/g, '')),
                                 };
-                                handleAddToCart(productData);
+                                handleButtonClick(product.key, productData);
                               }}
-                              className="w-10 h-10 rounded-lg bg-primary text-white flex items-center justify-center hover:bg-primary-dark transition-all shadow-md hover:shadow-lg hover:scale-110 active:scale-95"
+                              className="relative w-10 h-10 rounded-lg bg-primary text-white flex items-center justify-center hover:bg-primary-dark transition-all shadow-md hover:shadow-lg hover:scale-110 active:scale-95 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 overflow-hidden"
+                              aria-label={language === 'tr' ? `${item.name} sepete ekle` : `Add ${item.name} to cart`}
                             >
-                              <Icon icon="lucide:plus" width={20} height={20} strokeWidth={2.5} />
+                              {rippleButton === product.key && (
+                                <motion.span
+                                  initial={{ scale: 0, opacity: 0.5 }}
+                                  animate={{ scale: 4, opacity: 0 }}
+                                  transition={{ duration: 0.6 }}
+                                  className="absolute inset-0 bg-white rounded-full"
+                                />
+                              )}
+                              <Icon icon="lucide:plus" width={20} height={20} strokeWidth={2.5} className="relative z-10" />
                             </button>
                           </div>
                         </div>
@@ -356,6 +390,14 @@ export default function MenuPage() {
           }}
         />
       )}
+
+      {/* Toast Notification */}
+      <Toast
+        message={toast.message}
+        isVisible={toast.isVisible}
+        onClose={() => setToast({ ...toast, isVisible: false })}
+        type="success"
+      />
     </LanguageWrapper>
   );
 }

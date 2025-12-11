@@ -1,5 +1,7 @@
 import { useLanguage } from '../context/LanguageContext';
 import { motion } from 'framer-motion';
+import { Icon } from '@iconify/react';
+import CountUp from './CountUp';
 
 export default function About() {
   const { t, language } = useLanguage();
@@ -79,7 +81,7 @@ export default function About() {
                 {/* Content */}
                 <div className={`flex-1 ${index % 2 === 0 ? 'md:pr-12 md:text-right' : 'md:pl-12'}`}>
                   <div className={`inline-block ${index % 2 === 0 ? 'md:ml-auto' : ''}`}>
-                    <span className="text-5xl md:text-6xl font-serif font-bold text-primary/20 mb-2 block">
+                    <span className="text-6xl md:text-7xl lg:text-8xl font-serif font-bold text-primary/30 mb-3 block leading-none">
                       {item.year}
                     </span>
                     <h3 className="text-2xl md:text-3xl font-bold text-secondary mb-4">
@@ -93,15 +95,18 @@ export default function About() {
 
                 {/* Image */}
                 <div className={`flex-1 ${index % 2 === 0 ? 'md:pl-12' : 'md:pr-12'}`}>
-                  <div className="relative rounded-2xl overflow-hidden shadow-xl group">
+                  <div className="relative rounded-2xl overflow-hidden shadow-xl border border-border group">
                     <img
                       src={item.image}
                       alt={item.title}
                       className="w-full h-64 md:h-80 object-cover group-hover:scale-110 transition-transform duration-700"
-                      style={{ filter: 'brightness(1.05) contrast(1.1) saturate(1.1)' }}
+                      style={{ 
+                        filter: 'brightness(1.05) contrast(1.1) saturate(1.15)',
+                        imageRendering: 'crisp-edges'
+                      }}
                       loading="lazy"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-secondary/20 to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-secondary/10 to-transparent"></div>
                   </div>
                 </div>
               </motion.div>
@@ -117,30 +122,57 @@ export default function About() {
           className="mt-24 pt-16 border-t border-border"
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
-            <div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="flex flex-col items-center"
+            >
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <Icon icon="lucide:calendar" width={32} height={32} className="text-primary" />
+              </div>
               <span className="block text-5xl md:text-6xl font-serif font-bold text-primary mb-3">
-                35+
+                <CountUp end={35} suffix="+" />
               </span>
               <span className="text-sm md:text-base text-text-muted uppercase tracking-wider font-semibold">
                 {t('about.years')}
               </span>
-            </div>
-            <div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="flex flex-col items-center"
+            >
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <Icon icon="lucide:map-pin" width={32} height={32} className="text-primary" />
+              </div>
               <span className="block text-5xl md:text-6xl font-serif font-bold text-primary mb-3">
-                12
+                <CountUp end={12} />
               </span>
               <span className="text-sm md:text-base text-text-muted uppercase tracking-wider font-semibold">
                 {t('about.locations')}
               </span>
-            </div>
-            <div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="flex flex-col items-center"
+            >
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <Icon icon="lucide:smile" width={32} height={32} className="text-primary" />
+              </div>
               <span className="block text-5xl md:text-6xl font-serif font-bold text-primary mb-3">
-                10k+
+                <CountUp end={10} suffix="k+" />
               </span>
               <span className="text-sm md:text-base text-text-muted uppercase tracking-wider font-semibold">
                 {t('about.happyGuests')}
               </span>
-            </div>
+            </motion.div>
           </div>
         </motion.div>
       </div>

@@ -78,7 +78,93 @@ export const tr = {
     lastName: "Soyad",
     email: "E-posta Adresi",
     submit: "Franchise Bilgisi İste",
-    terms: "Göndererek, hizmet şartlarımızı kabul etmiş olursunuz."
+    terms: "Göndererek, hizmet şartlarımızı kabul etmiş olursunuz.",
+    page: {
+      heroTitle: "Kendi WMB Cafe'nizi Açın",
+      heroSubtitle: "Lezzet, kalite ve topluluk üzerine kurulu bir geleneğe katılın",
+      startApplication: "Başvuruyu Başlat",
+      downloadGuide: "Franchise Rehberini İndir",
+      whyTitle: "Neden WMB Cafe ile Franchise?",
+      whyCards: {
+        location: {
+          title: "Lokasyon Desteği",
+          description: "Size en uygun lokasyonu bulmak için tam destek sağlıyoruz. Şehir analizi, nüfus yoğunluğu ve potansiyel müşteri profili değerlendirmesi yapıyoruz."
+        },
+        training: {
+          title: "Eğitim & Ekipman",
+          description: "Kapsamlı eğitim programımız ve standart ekipman tedarik zincirimizle işletmenizi en iyi şekilde başlatmanızı sağlıyoruz."
+        },
+        brand: {
+          title: "Marka Tanınırlığı",
+          description: "35 yıllık güvenilir marka imajımız ve yerleşik müşteri tabanımızla piyasaya güçlü bir giriş yaparsınız."
+        },
+        recipes: {
+          title: "Kanıtlanmış Tarifler",
+          description: "Orijinal Sariyer Böreği ve diğer özel tariflerimiz, tutarlı lezzet ve kalite garantisi sunar."
+        }
+      },
+      processTitle: "Franchise Süreci",
+      processSteps: {
+        step1: {
+          title: "Başvuru",
+          description: "Online başvuru formunu doldurun. Temel bilgilerinizi ve iş deneyiminizi paylaşın."
+        },
+        step2: {
+          title: "Ön Görüşme",
+          description: "Franchise ekibimizle tanışın, beklentilerinizi ve hedeflerinizi konuşun."
+        },
+        step3: {
+          title: "Lokasyon Seçimi",
+          description: "Uzman ekibimizle birlikte size en uygun lokasyonu belirleyin."
+        },
+        step4: {
+          title: "Eğitim",
+          description: "Mutfak teknikleri, işletme yönetimi ve marka standartları konularında kapsamlı eğitim alın."
+        },
+        step5: {
+          title: "Açılış",
+          description: "Büyük açılışınızı yapın ve WMB Cafe ailesinin bir parçası olun!"
+        }
+      },
+      investmentTitle: "Yatırım & Gereksinimler",
+      investment: {
+        range: "Yatırım Aralığı",
+        equipment: "Ekipman Maliyeti",
+        operational: "İşletme Modeli",
+        total: "Toplam Başlangıç Yatırımı"
+      },
+      requirementsTitle: "Gereksinimler",
+      requirements: {
+        experience: "İş Deneyimi",
+        capital: "Minimum Sermaye",
+        city: "Şehir Uygunluğu",
+        commitment: "Taahhüt"
+      },
+      storiesTitle: "Başarı Hikayeleri",
+      stories: {
+        story1: {
+          quote: "WMB Cafe ile franchise açmak hayatımın en iyi kararıydı. Marka desteği ve eğitim programı sayesinde ilk yılımı kârlı kapattım.",
+          name: "Ayşe Yılmaz",
+          location: "Nişantaşı, İstanbul",
+          image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=800"
+        },
+        story2: {
+          quote: "35 yıllık bir marka ile çalışmak, müşteri güveni açısından çok değerli. İlk ayımızdan itibaren düzenli müşterilerimiz oldu.",
+          name: "Mehmet Demir",
+          location: "Kızılay, Ankara",
+          image: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=800"
+        },
+        story3: {
+          quote: "Tarifler, eğitim, tedarik zinciri - her şey hazır. Biz sadece işletmeyi yönetiyoruz ve sonuçlar harika!",
+          name: "Zeynep Kaya",
+          location: "Alsancak, İzmir",
+          image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=800"
+        }
+      },
+      ctaTitle: "Yolculuğunuza Başlamaya Hazır mısınız?",
+      ctaSubtitle: "Sadece 5 dakikadan az sürer.",
+      ctaButton: "Başvuruyu Başlat"
+    }
   },
   footer: {
     description: "Tarihsel lezzetler ve modern estetik karışımıyla kafe deneyimini yeniden tanımlıyoruz.",
@@ -94,6 +180,50 @@ export const tr = {
     cookiePolicy: "Çerez Politikası",
     copyright: "© 2023 WMB Cafe. Tüm hakları saklıdır.",
     allSystemsOperational: "Tüm sistemler çalışıyor"
+  },
+  story: {
+    heroTitle: "Hikayemiz",
+    heroSubtitle: "Lezzet, gelenek ve zanaatkârlığın yolculuğu",
+    foundingTitle: "Başlangıç Noktası",
+    foundingContent: "1985 yılında, İstanbul'un göz alıcı semti Sariyer'de mütevazı bir aile fırını olarak başladık. Kurucularımız, dedelerinden kalma geleneksel börek tariflerini modern damak zevkiyle harmanlayarak bir lezzet efsanesi yarattı. İlk günlerden itibaren, her bir hamur katmanını el ile açmanın, en kaliteli malzemeleri seçmenin ve müşterilerimize en taze ürünleri sunmanın önemine inandık. Bu tutku, bugün WMB Cafe'nin temel taşını oluşturuyor.",
+    timeline: {
+      milestone1: {
+        year: "1985",
+        title: "İlk Fırın",
+        description: "Sariyer'de küçük bir fırın olarak açıldık. Dedelerimizden kalma tariflerle, günlük taze börek üretimine başladık."
+      },
+      milestone2: {
+        year: "1996",
+        title: "İmza Tarif",
+        description: "Klasik Sariyer Böreği'nin efsanevi tarifini geliştirdik. Bu tarif, markamızın bugüne kadar devam eden simgesi oldu."
+      },
+      milestone3: {
+        year: "2010",
+        title: "Kafe Konsepti",
+        description: "Sadece fırın olmaktan çıkıp, modern bir kafe deneyimi sunmaya başladık. Kahve ve geleneksel lezzetleri bir araya getirdik."
+      },
+      milestone4: {
+        year: "2023",
+        title: "WMB Cafe Yeniden Markalaşma",
+        description: "Modern tasarım ve geleneksel lezzetleri birleştirerek WMB Cafe markası altında yeni bir döneme başladık."
+      }
+    },
+    values: {
+      originalTaste: {
+        title: "Orijinal Lezzet",
+        description: "Nesiller boyu korunan tariflerimizle, her lokmada geleneksel Türk mutfağının özgün tadını yaşatıyoruz."
+      },
+      handcrafted: {
+        title: "El İşçiliği Geleneği",
+        description: "Her börek el ile açılır, her katman özenle hazırlanır. Modern ekipmanlar kullanıyoruz ama zanaatkâr ruhumuzu koruyoruz."
+      },
+      community: {
+        title: "Topluluk Bağlılığı",
+        description: "Sadece bir kafe değiliz; mahallemizin, şehrimizin bir parçasıyız. Her gelen misafir ailemizin bir parçası olur."
+      }
+    },
+    ctaTitle: "Geleneğin Tadını Deneyimleyin",
+    ctaButton: "Yakınımızdaki Lokasyonu Bul"
   }
 };
 

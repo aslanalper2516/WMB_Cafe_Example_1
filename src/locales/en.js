@@ -78,7 +78,93 @@ export const en = {
     lastName: "Last Name",
     email: "Email Address",
     submit: "Request Franchise Info",
-    terms: "By submitting, you agree to our terms of service."
+    terms: "By submitting, you agree to our terms of service.",
+    page: {
+      heroTitle: "Open Your Own WMB Cafe",
+      heroSubtitle: "Join a tradition built on flavor, quality, and community",
+      startApplication: "Start Application",
+      downloadGuide: "Download Franchise Guide",
+      whyTitle: "Why Franchise with WMB Cafe?",
+      whyCards: {
+        location: {
+          title: "Location Support",
+          description: "We provide full support to find the perfect location for you. We conduct city analysis, population density, and potential customer profile evaluation."
+        },
+        training: {
+          title: "Training & Equipment",
+          description: "Our comprehensive training program and standard equipment supply chain ensure you start your business in the best way possible."
+        },
+        brand: {
+          title: "Brand Recognition",
+          description: "Enter the market strong with our 35-year trusted brand image and established customer base."
+        },
+        recipes: {
+          title: "Proven Recipes",
+          description: "Our original Sariyer Börek and other special recipes guarantee consistent flavor and quality."
+        }
+      },
+      processTitle: "Franchise Process",
+      processSteps: {
+        step1: {
+          title: "Application",
+          description: "Fill out the online application form. Share your basic information and business experience."
+        },
+        step2: {
+          title: "Initial Interview",
+          description: "Meet with our franchise team, discuss your expectations and goals."
+        },
+        step3: {
+          title: "Location Selection",
+          description: "Determine the best location for you together with our expert team."
+        },
+        step4: {
+          title: "Training",
+          description: "Receive comprehensive training on kitchen techniques, business management, and brand standards."
+        },
+        step5: {
+          title: "Grand Opening",
+          description: "Launch your grand opening and become part of the WMB Cafe family!"
+        }
+      },
+      investmentTitle: "Investment & Requirements",
+      investment: {
+        range: "Investment Range",
+        equipment: "Equipment Cost",
+        operational: "Operational Model",
+        total: "Total Startup Investment"
+      },
+      requirementsTitle: "Requirements",
+      requirements: {
+        experience: "Business Experience",
+        capital: "Minimum Capital",
+        city: "City Availability",
+        commitment: "Commitment"
+      },
+      storiesTitle: "Success Stories",
+      stories: {
+        story1: {
+          quote: "Opening a franchise with WMB Cafe was the best decision of my life. Thanks to brand support and training program, I ended my first year profitable.",
+          name: "Ayşe Yılmaz",
+          location: "Nişantaşı, Istanbul",
+          image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=800"
+        },
+        story2: {
+          quote: "Working with a 35-year-old brand is very valuable in terms of customer trust. We had regular customers from our first month.",
+          name: "Mehmet Demir",
+          location: "Kızılay, Ankara",
+          image: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=800"
+        },
+        story3: {
+          quote: "Recipes, training, supply chain - everything is ready. We just manage the business and the results are great!",
+          name: "Zeynep Kaya",
+          location: "Alsancak, İzmir",
+          image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=800"
+        }
+      },
+      ctaTitle: "Ready to Start Your Journey?",
+      ctaSubtitle: "Takes less than 5 minutes.",
+      ctaButton: "Begin Application"
+    }
   },
   footer: {
     description: "Redefining the cafe experience with a blend of historical flavors and modern aesthetics.",
@@ -94,6 +180,50 @@ export const en = {
     cookiePolicy: "Cookie Policy",
     copyright: "© 2023 WMB Cafe. All rights reserved.",
     allSystemsOperational: "All systems operational"
+  },
+  story: {
+    heroTitle: "Our Story",
+    heroSubtitle: "A journey of flavor, tradition, and craftsmanship",
+    foundingTitle: "Where It All Began",
+    foundingContent: "In 1985, we started as a humble family bakery in Sariyer, one of Istanbul's most beautiful neighborhoods. Our founders blended traditional börek recipes inherited from their grandparents with modern palates, creating a flavor legend. From the very first days, we believed in the importance of hand-rolling each layer of dough, selecting the finest ingredients, and serving our customers the freshest products. This passion forms the cornerstone of WMB Cafe today.",
+    timeline: {
+      milestone1: {
+        year: "1985",
+        title: "First Bakery",
+        description: "We opened as a small bakery in Sariyer. With recipes passed down from our grandparents, we began producing fresh daily börek."
+      },
+      milestone2: {
+        year: "1996",
+        title: "Signature Recipe",
+        description: "We perfected the legendary recipe for the classic Sariyer Börek. This recipe became the enduring symbol of our brand."
+      },
+      milestone3: {
+        year: "2010",
+        title: "Cafe Concept",
+        description: "We evolved from just a bakery to offering a modern cafe experience. We brought together coffee and traditional flavors."
+      },
+      milestone4: {
+        year: "2023",
+        title: "WMB Cafe Rebrand",
+        description: "We began a new era under the WMB Cafe brand, combining modern design with traditional flavors."
+      }
+    },
+    values: {
+      originalTaste: {
+        title: "Original Taste",
+        description: "With recipes preserved for generations, we bring the authentic taste of traditional Turkish cuisine to every bite."
+      },
+      handcrafted: {
+        title: "Handcrafted Tradition",
+        description: "Every börek is hand-rolled, every layer carefully prepared. We use modern equipment but preserve our artisanal spirit."
+      },
+      community: {
+        title: "Community Commitment",
+        description: "We're not just a cafe; we're part of our neighborhood, part of our city. Every guest becomes part of our family."
+      }
+    },
+    ctaTitle: "Experience the Taste of Tradition",
+    ctaButton: "Find a Nearby Location"
   }
 };
 

@@ -2,12 +2,16 @@ import { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import LanguageWrapper from '../components/LanguageWrapper';
+import Toast from '../components/Toast';
 
 export default function LocationsPage() {
   const { t, language } = useLanguage();
   const [selectedCity, setSelectedCity] = useState('all');
+  const [nearestLocationId, setNearestLocationId] = useState(null);
+  const [isFindingNearest, setIsFindingNearest] = useState(false);
+  const [toast, setToast] = useState({ message: '', isVisible: false, type: 'success' });
 
   const locations = [
     {
@@ -84,33 +88,92 @@ export default function LocationsPage() {
     : locations.filter(loc => loc.city === selectedCity);
 
   const handleFindNearest = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
+    if (!navigator.geolocation) {
+      setToast({
+        message: language === 'tr' ? 'Tarayıcınız konum servisini desteklemiyor' : 'Your browser does not support geolocation',
+        isVisible: true,
+        type: 'error',
+      });
+      setTimeout(() => setToast({ ...toast, isVisible: false }), 3000);
+      return;
+    }
+
+    setIsFindingNearest(true);
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
         const userLat = position.coords.latitude;
         const userLng = position.coords.longitude;
         
-        // Find nearest location
+        // Find nearest location using Haversine formula for accurate distance
         let nearest = locations[0];
         let minDistance = Infinity;
 
         locations.forEach(loc => {
-          const distance = Math.sqrt(
-            Math.pow(loc.coordinates.lat - userLat, 2) +
-            Math.pow(loc.coordinates.lng - userLng, 2)
-          );
+          const R = 6371; // Earth's radius in km
+          const dLat = (loc.coordinates.lat - userLat) * Math.PI / 180;
+          const dLng = (loc.coordinates.lng - userLng) * Math.PI / 180;
+          const a = 
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(userLat * Math.PI / 180) * Math.cos(loc.coordinates.lat * Math.PI / 180) *
+            Math.sin(dLng / 2) * Math.sin(dLng / 2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+          const distance = R * c;
+          
           if (distance < minDistance) {
             minDistance = distance;
             nearest = loc;
           }
         });
 
+        setNearestLocationId(nearest.id);
+        setIsFindingNearest(false);
+
         // Scroll to nearest location
-        document.getElementById(`location-${nearest.id}`)?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
+        setTimeout(() => {
+          document.getElementById(`location-${nearest.id}`)?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+        }, 100);
+      },
+      (error) => {
+        setIsFindingNearest(false);
+        let errorMessage = '';
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = language === 'tr' 
+              ? 'Konum izni reddedildi. Lütfen tarayıcı ayarlarından konum iznini açın.'
+              : 'Location permission denied. Please enable location access in browser settings.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = language === 'tr'
+              ? 'Konum bilgisi alınamadı'
+              : 'Location information unavailable';
+            break;
+          case error.TIMEOUT:
+            errorMessage = language === 'tr'
+              ? 'Konum isteği zaman aşımına uğradı'
+              : 'Location request timed out';
+            break;
+          default:
+            errorMessage = language === 'tr'
+              ? 'Konum alınırken bir hata oluştu'
+              : 'An error occurred while getting location';
+        }
+        setToast({
+          message: errorMessage,
+          isVisible: true,
+          type: 'error',
         });
-      });
-    }
+        setTimeout(() => setToast({ ...toast, isVisible: false }), 5000);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
   };
 
   return (
@@ -165,12 +228,16 @@ export default function LocationsPage() {
                 {cities.map((city) => (
                   <button
                     key={city.id}
-                    onClick={() => setSelectedCity(city.id)}
-                    className={`px-6 py-2.5 rounded-lg font-semibold text-sm whitespace-nowrap transition-all ${
+                    onClick={() => {
+                      setSelectedCity(city.id);
+                      setNearestLocationId(null); // Reset nearest badge when filtering
+                    }}
+                    className={`px-6 py-2.5 rounded-lg font-semibold text-sm whitespace-nowrap transition-all focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
                       selectedCity === city.id
                         ? 'bg-primary text-white shadow-md'
-                        : 'bg-background text-text-muted hover:text-secondary'
+                        : 'bg-background text-text-muted hover:text-secondary hover:bg-background'
                     }`}
+                    aria-pressed={selectedCity === city.id}
                   >
                     {city.label}
                   </button>
@@ -178,10 +245,26 @@ export default function LocationsPage() {
               </div>
               <button
                 onClick={handleFindNearest}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-secondary text-white font-semibold hover:bg-secondary/90 transition-all shadow-md hover:shadow-lg whitespace-nowrap"
+                disabled={isFindingNearest}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-secondary text-white font-semibold hover:bg-secondary/90 transition-all shadow-md hover:shadow-lg whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-secondary focus-visible:outline-offset-2"
+                aria-label={language === 'tr' ? 'En yakın lokasyonu bul' : 'Find nearest location'}
               >
-                <Icon icon="lucide:navigation" width={18} height={18} />
-                {language === 'tr' ? 'En Yakını Bul' : 'Find Nearest'}
+                {isFindingNearest ? (
+                  <>
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    >
+                      <Icon icon="lucide:loader-2" width={18} height={18} />
+                    </motion.div>
+                    <span>{language === 'tr' ? 'Aranıyor...' : 'Searching...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <Icon icon="lucide:navigation" width={18} height={18} />
+                    <span>{language === 'tr' ? 'En Yakını Bul' : 'Find Nearest'}</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -189,17 +272,35 @@ export default function LocationsPage() {
 
         {/* Locations Grid */}
         <main className="max-w-7xl mx-auto px-6 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredLocations.map((location, index) => (
-              <motion.div
-                key={location.id}
-                id={`location-${location.id}`}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-2xl border border-border p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
-              >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={selectedCity}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
+              {filteredLocations.map((location, index) => (
+                <motion.div
+                  key={location.id}
+                  id={`location-${location.id}`}
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ delay: index * 0.05, duration: 0.3 }}
+                  className="bg-white rounded-2xl border border-border p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative"
+                >
+                  {nearestLocationId === location.id && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-3 -right-3 bg-primary text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1"
+                    >
+                      <Icon icon="lucide:map-pin" width={12} height={12} />
+                      {language === 'tr' ? 'En Yakın' : 'Nearest'}
+                    </motion.div>
+                  )}
                 <h3 className="text-2xl font-bold text-secondary mb-2">{location.name}</h3>
                 <div className="space-y-3 mb-6">
                   <div className="flex items-start gap-2 text-text-muted">
@@ -235,9 +336,10 @@ export default function LocationsPage() {
                     {language === 'tr' ? 'Harita' : 'Map'}
                   </a>
                 </div>
-              </motion.div>
-            ))}
-          </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </AnimatePresence>
         </main>
 
         {/* Map Section */}
@@ -260,6 +362,14 @@ export default function LocationsPage() {
           </div>
         </section>
       </div>
+
+      {/* Toast Notification */}
+      <Toast
+        message={toast.message}
+        isVisible={toast.isVisible}
+        onClose={() => setToast({ ...toast, isVisible: false })}
+        type={toast.type}
+      />
     </LanguageWrapper>
   );
 }

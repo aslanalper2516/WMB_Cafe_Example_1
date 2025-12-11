@@ -18,29 +18,128 @@ export default function Franchise() {
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [touched, setTouched] = useState({});
+
+  const validateEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const validatePhone = (phone) => {
+    return /^[\d\s\-\+\(\)]+$/.test(phone) && phone.replace(/\D/g, '').length >= 10;
+  };
 
   const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: '' });
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched({ ...touched, [name]: true });
+    
+    // Validate on blur
+    let error = '';
+    if (!value.trim()) {
+      error = language === 'tr' ? 'Bu alan zorunludur' : 'This field is required';
+    } else if (name === 'email' && !validateEmail(value)) {
+      error = language === 'tr' ? 'Geçerli bir e-posta adresi girin' : 'Enter a valid email address';
+    } else if (name === 'phone' && !validatePhone(value)) {
+      error = language === 'tr' ? 'Geçerli bir telefon numarası girin' : 'Enter a valid phone number';
+    }
+    
+    if (error) {
+      setErrors({ ...errors, [name]: error });
+    }
+  };
+
+  const validateStep1 = () => {
+    const newErrors = {};
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = language === 'tr' ? 'Ad zorunludur' : 'First name is required';
+    }
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = language === 'tr' ? 'Soyad zorunludur' : 'Last name is required';
+    }
+    if (!formData.email.trim()) {
+      newErrors.email = language === 'tr' ? 'E-posta zorunludur' : 'Email is required';
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = language === 'tr' ? 'Geçerli bir e-posta adresi girin' : 'Enter a valid email address';
+    }
+    if (!formData.phone.trim()) {
+      newErrors.phone = language === 'tr' ? 'Telefon zorunludur' : 'Phone is required';
+    } else if (!validatePhone(formData.phone)) {
+      newErrors.phone = language === 'tr' ? 'Geçerli bir telefon numarası girin' : 'Enter a valid phone number';
+    }
+    return newErrors;
+  };
+
+  const validateStep2 = () => {
+    const newErrors = {};
+    if (!formData.city.trim()) {
+      newErrors.city = language === 'tr' ? 'Şehir zorunludur' : 'City is required';
+    }
+    if (!formData.investmentRange) {
+      newErrors.investmentRange = language === 'tr' ? 'Yatırım aralığı seçiniz' : 'Select investment range';
+    }
+    if (!formData.experience) {
+      newErrors.experience = language === 'tr' ? 'Deneyim seviyesi seçiniz' : 'Select experience level';
+    }
+    return newErrors;
   };
 
   const handleNext = () => {
     if (step === 1) {
-      if (formData.firstName && formData.lastName && formData.email && formData.phone) {
+      const step1Errors = validateStep1();
+      if (Object.keys(step1Errors).length === 0) {
         setStep(2);
+        setErrors({});
+      } else {
+        setErrors(step1Errors);
+        setTouched({
+          firstName: true,
+          lastName: true,
+          email: true,
+          phone: true,
+        });
       }
     } else if (step === 2) {
-      if (formData.city && formData.investmentRange && formData.experience) {
+      const step2Errors = validateStep2();
+      const allErrors = { ...step2Errors };
+      
+      if (!acceptedTerms) {
+        allErrors.terms = language === 'tr' ? 'KVKK şartlarını kabul etmelisiniz' : 'You must accept the privacy policy';
+      }
+      
+      if (Object.keys(allErrors).length === 0) {
         handleSubmit();
+      } else {
+        setErrors(allErrors);
+        setTouched({
+          city: true,
+          investmentRange: true,
+          experience: true,
+        });
       }
     }
   };
 
-  const handleSubmit = () => {
-    if (acceptedTerms) {
-      setIsSubmitted(true);
-      // Here you would typically send the data to your backend
-      console.log('Form submitted:', formData);
-    }
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    setIsLoading(false);
+    setIsSubmitted(true);
+    // Here you would typically send the data to your backend
+    console.log('Form submitted:', formData);
   };
 
   const investmentRanges = language === 'tr' 
@@ -171,9 +270,20 @@ export default function Franchise() {
                       name="firstName"
                       value={formData.firstName}
                       onChange={handleInputChange}
-                      className="w-full h-12 px-4 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                      required
+                      onBlur={handleBlur}
+                      className={`w-full h-12 px-4 rounded-lg border text-sm focus:outline-none focus:ring-2 transition-all ${
+                        errors.firstName && touched.firstName
+                          ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
+                          : 'border-border focus:ring-primary/20 focus:border-primary'
+                      }`}
+                      aria-invalid={errors.firstName && touched.firstName}
+                      aria-describedby={errors.firstName && touched.firstName ? 'firstName-error' : undefined}
                     />
+                    {errors.firstName && touched.firstName && (
+                      <p id="firstName-error" className="mt-1 text-xs text-red-500" role="alert">
+                        {errors.firstName}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-secondary mb-2">
@@ -184,9 +294,20 @@ export default function Franchise() {
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleInputChange}
-                      className="w-full h-12 px-4 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                      required
+                      onBlur={handleBlur}
+                      className={`w-full h-12 px-4 rounded-lg border text-sm focus:outline-none focus:ring-2 transition-all ${
+                        errors.lastName && touched.lastName
+                          ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
+                          : 'border-border focus:ring-primary/20 focus:border-primary'
+                      }`}
+                      aria-invalid={errors.lastName && touched.lastName}
+                      aria-describedby={errors.lastName && touched.lastName ? 'lastName-error' : undefined}
                     />
+                    {errors.lastName && touched.lastName && (
+                      <p id="lastName-error" className="mt-1 text-xs text-red-500" role="alert">
+                        {errors.lastName}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div>
@@ -198,9 +319,20 @@ export default function Franchise() {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full h-12 px-4 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                    required
+                    onBlur={handleBlur}
+                    className={`w-full h-12 px-4 rounded-lg border text-sm focus:outline-none focus:ring-2 transition-all ${
+                      errors.email && touched.email
+                        ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
+                        : 'border-border focus:ring-primary/20 focus:border-primary'
+                    }`}
+                    aria-invalid={errors.email && touched.email}
+                    aria-describedby={errors.email && touched.email ? 'email-error' : undefined}
                   />
+                  {errors.email && touched.email && (
+                    <p id="email-error" className="mt-1 text-xs text-red-500" role="alert">
+                      {errors.email}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-secondary mb-2">
@@ -211,13 +343,24 @@ export default function Franchise() {
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    className="w-full h-12 px-4 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                    required
+                    onBlur={handleBlur}
+                    className={`w-full h-12 px-4 rounded-lg border text-sm focus:outline-none focus:ring-2 transition-all ${
+                      errors.phone && touched.phone
+                        ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
+                        : 'border-border focus:ring-primary/20 focus:border-primary'
+                    }`}
+                    aria-invalid={errors.phone && touched.phone}
+                    aria-describedby={errors.phone && touched.phone ? 'phone-error' : undefined}
                   />
+                  {errors.phone && touched.phone && (
+                    <p id="phone-error" className="mt-1 text-xs text-red-500" role="alert">
+                      {errors.phone}
+                    </p>
+                  )}
                 </div>
                 <button
                   onClick={handleNext}
-                  className="w-full h-14 rounded-lg bg-primary text-white font-semibold hover:bg-primary-dark transition-all shadow-lg hover:shadow-xl mt-6"
+                  className="w-full h-14 rounded-lg bg-primary text-white font-semibold hover:bg-primary-dark transition-all shadow-lg hover:shadow-xl mt-6 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                 >
                   {language === 'tr' ? 'Devam Et' : 'Continue'}
                 </button>
@@ -246,9 +389,20 @@ export default function Franchise() {
                     name="city"
                     value={formData.city}
                     onChange={handleInputChange}
-                    className="w-full h-12 px-4 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                    required
+                    onBlur={handleBlur}
+                    className={`w-full h-12 px-4 rounded-lg border text-sm focus:outline-none focus:ring-2 transition-all ${
+                      errors.city && touched.city
+                        ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
+                        : 'border-border focus:ring-primary/20 focus:border-primary'
+                    }`}
+                    aria-invalid={errors.city && touched.city}
+                    aria-describedby={errors.city && touched.city ? 'city-error' : undefined}
                   />
+                  {errors.city && touched.city && (
+                    <p id="city-error" className="mt-1 text-xs text-red-500" role="alert">
+                      {errors.city}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-secondary mb-2">
@@ -258,14 +412,25 @@ export default function Franchise() {
                     name="investmentRange"
                     value={formData.investmentRange}
                     onChange={handleInputChange}
-                    className="w-full h-12 px-4 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                    required
+                    onBlur={handleBlur}
+                    className={`w-full h-12 px-4 rounded-lg border text-sm focus:outline-none focus:ring-2 transition-all ${
+                      errors.investmentRange && touched.investmentRange
+                        ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
+                        : 'border-border focus:ring-primary/20 focus:border-primary'
+                    }`}
+                    aria-invalid={errors.investmentRange && touched.investmentRange}
+                    aria-describedby={errors.investmentRange && touched.investmentRange ? 'investmentRange-error' : undefined}
                   >
                     <option value="">{language === 'tr' ? 'Seçiniz' : 'Select'}</option>
                     {investmentRanges.map((range, index) => (
                       <option key={index} value={range}>{range}</option>
                     ))}
                   </select>
+                  {errors.investmentRange && touched.investmentRange && (
+                    <p id="investmentRange-error" className="mt-1 text-xs text-red-500" role="alert">
+                      {errors.investmentRange}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-secondary mb-2">
@@ -275,14 +440,25 @@ export default function Franchise() {
                     name="experience"
                     value={formData.experience}
                     onChange={handleInputChange}
-                    className="w-full h-12 px-4 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                    required
+                    onBlur={handleBlur}
+                    className={`w-full h-12 px-4 rounded-lg border text-sm focus:outline-none focus:ring-2 transition-all ${
+                      errors.experience && touched.experience
+                        ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
+                        : 'border-border focus:ring-primary/20 focus:border-primary'
+                    }`}
+                    aria-invalid={errors.experience && touched.experience}
+                    aria-describedby={errors.experience && touched.experience ? 'experience-error' : undefined}
                   >
                     <option value="">{language === 'tr' ? 'Seçiniz' : 'Select'}</option>
                     {experienceOptions.map((exp, index) => (
                       <option key={index} value={exp}>{exp}</option>
                     ))}
                   </select>
+                  {errors.experience && touched.experience && (
+                    <p id="experience-error" className="mt-1 text-xs text-red-500" role="alert">
+                      {errors.experience}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-secondary mb-2">
@@ -302,9 +478,15 @@ export default function Franchise() {
                     type="checkbox"
                     id="terms"
                     checked={acceptedTerms}
-                    onChange={(e) => setAcceptedTerms(e.target.checked)}
-                    className="mt-1 w-5 h-5 rounded border-border text-primary focus:ring-primary/20"
-                    required
+                    onChange={(e) => {
+                      setAcceptedTerms(e.target.checked);
+                      if (errors.terms) {
+                        setErrors({ ...errors, terms: '' });
+                      }
+                    }}
+                    className="mt-1 w-5 h-5 rounded border-border text-primary focus:ring-primary/20 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                    aria-invalid={errors.terms ? 'true' : 'false'}
+                    aria-describedby={errors.terms ? 'terms-error' : undefined}
                   />
                   <label htmlFor="terms" className="text-sm text-text-muted">
                     {language === 'tr'
@@ -312,19 +494,36 @@ export default function Franchise() {
                       : 'I have read and accept the privacy policy. *'}
                   </label>
                 </div>
+                {errors.terms && (
+                  <p id="terms-error" className="text-xs text-red-500 ml-8" role="alert">
+                    {errors.terms}
+                  </p>
+                )}
                 <div className="flex gap-4 mt-6">
                   <button
                     onClick={() => setStep(1)}
-                    className="flex-1 h-14 rounded-lg border-2 border-border text-secondary font-semibold hover:bg-background transition-all"
+                    className="flex-1 h-14 rounded-lg border-2 border-border text-secondary font-semibold hover:bg-background transition-all focus-visible:outline-2 focus-visible:outline-secondary focus-visible:outline-offset-2"
                   >
                     {language === 'tr' ? 'Geri' : 'Back'}
                   </button>
                   <button
                     onClick={handleNext}
-                    disabled={!acceptedTerms}
-                    className="flex-1 h-14 rounded-lg bg-primary text-white font-semibold hover:bg-primary-dark transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={!acceptedTerms || isLoading}
+                    className="flex-1 h-14 rounded-lg bg-primary text-white font-semibold hover:bg-primary-dark transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 flex items-center justify-center gap-2"
                   >
-                    {t('franchise.submit')}
+                    {isLoading ? (
+                      <>
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        >
+                          <Icon icon="lucide:loader-2" width={20} height={20} />
+                        </motion.div>
+                        <span>{language === 'tr' ? 'Gönderiliyor...' : 'Submitting...'}</span>
+                      </>
+                    ) : (
+                      t('franchise.submit')
+                    )}
                   </button>
                 </div>
               </div>

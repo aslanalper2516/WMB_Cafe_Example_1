@@ -2,16 +2,48 @@ import { useState } from 'react';
 import { Icon } from '@iconify/react';
 import { useLanguage } from '../context/LanguageContext';
 import { Link } from 'react-router-dom';
+import Toast from './Toast';
 
 export default function Footer() {
   const { t, language } = useLanguage();
   const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [toast, setToast] = useState({ message: '', isVisible: false, type: 'success' });
+
+  const validateEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
 
   const handleNewsletterSubmit = (e) => {
     e.preventDefault();
+    
+    if (!email.trim()) {
+      setEmailError(language === 'tr' ? 'E-posta adresi gerekli' : 'Email address is required');
+      return;
+    }
+    
+    if (!validateEmail(email)) {
+      setEmailError(language === 'tr' ? 'Geçerli bir e-posta adresi girin' : 'Enter a valid email address');
+      return;
+    }
+    
     // Newsletter subscription logic here
     console.log('Newsletter subscription:', email);
+    
+    // Show success toast
+    setToast({
+      message: language === 'tr' ? 'Bültene başarıyla kaydedildiniz!' : 'Successfully subscribed to newsletter!',
+      isVisible: true,
+      type: 'success',
+    });
+    
     setEmail('');
+    setEmailError('');
+    
+    // Auto-hide toast
+    setTimeout(() => {
+      setToast({ ...toast, isVisible: false });
+    }, 3000);
   };
 
   return (
@@ -32,21 +64,21 @@ export default function Footer() {
             <div className="flex gap-4">
               <a
                 href="#"
-                className="w-10 h-10 rounded-lg bg-white/10 hover:bg-primary flex items-center justify-center transition-all hover:scale-110"
+                className="w-10 h-10 rounded-lg bg-white/10 hover:bg-primary flex items-center justify-center transition-all hover:scale-110 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                 aria-label="Instagram"
               >
                 <Icon icon="lucide:instagram" width={20} height={20} />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 rounded-lg bg-white/10 hover:bg-primary flex items-center justify-center transition-all hover:scale-110"
+                className="w-10 h-10 rounded-lg bg-white/10 hover:bg-primary flex items-center justify-center transition-all hover:scale-110 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                 aria-label="Twitter"
               >
                 <Icon icon="lucide:twitter" width={20} height={20} />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 rounded-lg bg-white/10 hover:bg-primary flex items-center justify-center transition-all hover:scale-110"
+                className="w-10 h-10 rounded-lg bg-white/10 hover:bg-primary flex items-center justify-center transition-all hover:scale-110 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                 aria-label="Facebook"
               >
                 <Icon icon="lucide:facebook" width={20} height={20} />
@@ -59,13 +91,13 @@ export default function Footer() {
             <h4 className="font-bold text-lg mb-6">{t('footer.company')}</h4>
             <ul className="space-y-4">
               <li>
-                <Link to="/#about" className="text-gray-300 hover:text-primary transition-colors flex items-center gap-2">
+                <Link to="/story" className="text-gray-300 hover:text-primary transition-colors flex items-center gap-2">
                   <Icon icon="lucide:chevron-right" width={16} height={16} />
                   {t('footer.about')}
                 </Link>
               </li>
               <li>
-                <Link to="/#franchise" className="text-gray-300 hover:text-primary transition-colors flex items-center gap-2">
+                <Link to="/franchise" className="text-gray-300 hover:text-primary transition-colors flex items-center gap-2">
                   <Icon icon="lucide:chevron-right" width={16} height={16} />
                   {t('footer.franchise')}
                 </Link>
@@ -109,21 +141,37 @@ export default function Footer() {
               <h5 className="font-semibold mb-4">
                 {language === 'tr' ? 'Bülten' : 'Newsletter'}
               </h5>
-              <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder={language === 'tr' ? 'E-posta adresiniz' : 'Your email'}
-                  className="flex-1 h-11 px-4 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                  required
-                />
-                <button
-                  type="submit"
-                  className="h-11 px-6 rounded-lg bg-primary text-white hover:bg-primary-dark transition-all shadow-md hover:shadow-lg"
-                >
-                  <Icon icon="lucide:send" width={18} height={18} />
-                </button>
+              <form onSubmit={handleNewsletterSubmit} className="space-y-2">
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (emailError) setEmailError('');
+                    }}
+                    placeholder={language === 'tr' ? 'E-posta adresiniz' : 'Your email'}
+                    className={`flex-1 h-11 px-4 rounded-lg bg-white/10 border text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-all ${
+                      emailError
+                        ? 'border-red-500 focus:ring-red-500/50 focus:border-red-500'
+                        : 'border-white/20 focus:ring-primary/50 focus:border-primary'
+                    }`}
+                    aria-invalid={emailError ? 'true' : 'false'}
+                    aria-describedby={emailError ? 'newsletter-error' : undefined}
+                  />
+                  <button
+                    type="submit"
+                    className="h-11 px-6 rounded-lg bg-primary text-white hover:bg-primary-dark transition-all shadow-md hover:shadow-lg hover:scale-105 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                    aria-label={language === 'tr' ? 'Bültene kaydol' : 'Subscribe to newsletter'}
+                  >
+                    <Icon icon="lucide:send" width={18} height={18} />
+                  </button>
+                </div>
+                {emailError && (
+                  <p id="newsletter-error" className="text-xs text-red-300" role="alert">
+                    {emailError}
+                  </p>
+                )}
               </form>
             </div>
           </div>
@@ -141,6 +189,14 @@ export default function Footer() {
           </div>
         </div>
       </div>
+
+      {/* Toast Notification */}
+      <Toast
+        message={toast.message}
+        isVisible={toast.isVisible}
+        onClose={() => setToast({ ...toast, isVisible: false })}
+        type={toast.type}
+      />
     </footer>
   );
 }
